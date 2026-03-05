@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+{% block title %}Votantes · Sistema Electoral{% endblock %}
+{% block content %}
+<h1 class="h3 mb-3">Registro individual de votantes</h1>
+<p class="text-muted">Digita la cédula — el sistema trae nombre y líder del censo automáticamente.</p>
+
+{% if sc.total_padron == 0 %}
+  <div class="alert alert-warning">Primero debes cargar el <a href="{{ url_for('census') }}">Censo</a>.</div>
+{% endif %}
+
+<div class="row g-3">
+  <div class="col-lg-6">
+    <div class="card">
+      <div class="card-body">
+        <form method="get" action="{{ url_for('voters') }}" class="row g-2">
+          <div class="col-8">
+            <input class="form-control" name="cedula" value="{{ cedula }}" placeholder="Ej: 1090123456">
+          </div>
+          <div class="col-4">
+            <button class="btn btn-outline-primary w-100" type="submit">Consultar</button>
+          </div>
+        </form>
+
+        {% if info_censo %}
+          <hr>
+          {% if info_censo.encontrado %}
+            <div class="mb-2">
+              <div class="fw-semibold">{{ info_censo.nombre }}</div>
+              <div class="small text-muted">Líder: {{ info_censo.lider_nombre or 'N/A' }}</div>
+            </div>
+            {% if info_censo.estado == 'DISPONIBLE' %}
+              <div class="alert alert-success py-2">DISPONIBLE</div>
+              <form method="post" action="{{ url_for('voters_register') }}" class="mt-2">
+                <input type="hidden" name="cedula" value="{{ cedula }}">
+                <div class="form-check mb-2">
+                  <input class="form-check-input" type="checkbox" name="confirm" id="confirm">
+                  <label class="form-check-label" for="confirm">Confirmo el registro. Esta acción es irreversible.</label>
+                </div>
+                <button class="btn btn-primary w-100" type="submit">Registrar votante</button>
+              </form>
+            {% else %}
+              <div class="alert alert-danger py-2">INHABILITADA — ya fue utilizada</div>
+            {% endif %}
+          {% else %}
+            <div class="alert alert-warning py-2">No está en el censo electoral.</div>
+          {% endif %}
+        {% endif %}
+
+        <div class="mt-3">
+          <a class="btn btn-sm btn-outline-secondary" href="{{ url_for('export_plantilla') }}">Descargar plantilla CSV</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-6">
+    <div class="card">
+      <div class="card-body">
+        <h2 class="h6">Últimos 10 registros</h2>
+        {% if not recientes %}
+          <div class="text-muted">Sin registros aún.</div>
+        {% else %}
+          <div class="table-responsive">
+            <table class="table table-sm align-middle">
+              <thead>
+                <tr>
+                  <th>Fecha</th>
+                  <th>Cédula</th>
+                  <th>Nombre</th>
+                  <th>Líder</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for r in recientes %}
+                  <tr>
+                    <td class="text-nowrap">{% if r.fecha %}{{ r.fecha.strftime('%d/%m %H:%M') }}{% endif %}</td>
+                    <td class="text-nowrap">{{ r.cedula }}</td>
+                    <td>{{ r.nombre }}</td>
+                    <td>{{ r.lider }}</td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
