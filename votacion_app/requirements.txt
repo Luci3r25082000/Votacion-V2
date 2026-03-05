@@ -1,0 +1,13 @@
+flask>=3.0.0
+sqlalchemy>=2.0.0
+pandas>=2.0.0
+
+# Excel
+openpyxl>=3.1.0
+xlrd>=2.0.1
+
+# Postgres (psycopg3)
+psycopg[binary]>=3.2.0
+
+# Nota: el backup Streamlit existe como streamlit_app.py,
+# pero no se instala en producción (Vercel) para evitar conflictos/detección.

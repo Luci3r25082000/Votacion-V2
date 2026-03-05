@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+{% block title %}Gestión/Borrado · Sistema Electoral{% endblock %}
+{% block content %}
+<h1 class="h3 mb-3">Gestión y borrado de votantes</h1>
+<p class="text-muted">Estas operaciones borran votantes registrados y liberan sus cédulas a DISPONIBLE.</p>
+
+<div class="row g-3">
+  <div class="col-lg-6">
+    <div class="card">
+      <div class="card-body">
+        <h2 class="h6">Borrar por líder</h2>
+        {% if not lideres %}
+          <div class="text-muted">No hay líderes.</div>
+        {% else %}
+          <form method="post" action="{{ url_for('admin_delete_by_leader') }}" class="row g-2">
+            <div class="col-12">
+              <select class="form-select" name="lider_id" required>
+                {% for l in lideres %}
+                  <option value="{{ l.id }}">{{ l.nombre }} ({{ l.total_votantes }} votantes registrados)</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="col-12">
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" name="confirm" id="c_leader">
+                <label class="form-check-label" for="c_leader">Confirmo borrar los votantes de este líder</label>
+              </div>
+            </div>
+            <div class="col-12">
+              <button class="btn btn-danger w-100" type="submit">Borrar votantes del líder</button>
+            </div>
+          </form>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-6">
+    <div class="card border-danger">
+      <div class="card-body">
+        <h2 class="h6 text-danger">Borrar TODO</h2>
+        <p class="small text-muted">Se eliminarán {{ '{:,}'.format(sc.total_votantes) }} votantes de todos los líderes. El censo y líderes permanecen.</p>
+        <form method="post" action="{{ url_for('admin_delete_all') }}" class="row g-2">
+          <div class="col-12">
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" name="c1" id="c1">
+              <label class="form-check-label" for="c1">Entiendo que se borrarán TODOS los votantes</label>
+            </div>
+          </div>
+          <div class="col-12">
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" name="c2" id="c2">
+              <label class="form-check-label" for="c2">Confirmo continuar</label>
+            </div>
+          </div>
+          <div class="col-12">
+            <input class="form-control" name="texto" placeholder="Escribe BORRAR TODO">
+          </div>
+          <div class="col-12">
+            <button class="btn btn-danger w-100" type="submit">Ejecutar borrado total</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
